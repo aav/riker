@@ -3,6 +3,8 @@ use riker::actors::*;
 
 use std::time::Duration;
 
+use async_trait::async_trait;
+
 // Define the messages we'll use
 #[derive(Clone, Debug)]
 pub struct Add;
@@ -26,11 +28,12 @@ impl ActorFactoryArgs<u32> for Counter {
     }
 }
 
+#[async_trait]
 impl Actor for Counter {
     // we used the #[actor] attribute so CounterMsg is the Msg type
     type Msg = CounterMsg;
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         // Use the respective Receive<T> implementation
         self.receive(ctx, msg, sender);
     }

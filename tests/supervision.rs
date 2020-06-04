@@ -6,6 +6,8 @@ use riker::actors::*;
 use riker_testkit::probe::channel::{probe, ChannelProbe};
 use riker_testkit::probe::{Probe, ProbeReceive};
 
+use async_trait::async_trait;
+
 #[derive(Clone, Debug)]
 pub struct Panic;
 
@@ -15,16 +17,18 @@ pub struct TestProbe(ChannelProbe<(), ()>);
 #[derive(Default)]
 struct DumbActor;
 
+#[async_trait]
 impl Actor for DumbActor {
     type Msg = ();
 
-    fn recv(&mut self, _: &Context<Self::Msg>, _: Self::Msg, _: Sender) {}
+    async fn recv(&mut self, _: &Context<Self::Msg>, _: Self::Msg, _: Sender) {}
 }
 
 #[actor(TestProbe, Panic)]
 #[derive(Default)]
 struct PanicActor;
 
+#[async_trait]
 impl Actor for PanicActor {
     type Msg = PanicActorMsg;
 
@@ -38,7 +42,7 @@ impl Actor for PanicActor {
         ctx.actor_of::<DumbActor>("child_d").unwrap();
     }
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender);
     }
 }
@@ -66,6 +70,7 @@ struct RestartSup {
     actor_to_fail: Option<ActorRef<PanicActorMsg>>,
 }
 
+#[async_trait]
 impl Actor for RestartSup {
     type Msg = RestartSupMsg;
 
@@ -77,7 +82,7 @@ impl Actor for RestartSup {
         Strategy::Restart
     }
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender)
     }
 }
@@ -123,6 +128,7 @@ struct EscalateSup {
     actor_to_fail: Option<ActorRef<PanicActorMsg>>,
 }
 
+#[async_trait]
 impl Actor for EscalateSup {
     type Msg = EscalateSupMsg;
 
@@ -134,7 +140,7 @@ impl Actor for EscalateSup {
         Strategy::Escalate
     }
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender);
         // match msg {
         //     // We just resend the messages to the actor that we're concerned about testing
@@ -166,6 +172,7 @@ struct EscRestartSup {
     escalator: Option<ActorRef<EscalateSupMsg>>,
 }
 
+#[async_trait]
 impl Actor for EscRestartSup {
     type Msg = EscRestartSupMsg;
 
@@ -173,7 +180,7 @@ impl Actor for EscRestartSup {
         self.escalator = ctx.actor_of::<EscalateSup>("escalate-supervisor").ok();
     }
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender);
         // match msg {
         //     // We resend the messages to the parent of the actor that is/has panicked

@@ -1,5 +1,7 @@
 #![allow(unused_variables)]
 
+use async_trait::async_trait;
+
 use crate::{
     actor::{
         actor_cell::Context,
@@ -9,6 +11,7 @@ use crate::{
     Message,
 };
 
+#[async_trait]
 pub trait Actor: Send + 'static {
     type Msg: Message;
 
@@ -47,9 +50,12 @@ pub trait Actor: Send + 'static {
     ///
     /// It is guaranteed that only one message in the actor's mailbox is processed
     /// at any one time, including `recv` and `sys_recv`.
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender);
+    //fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {}
+
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender);
 }
 
+#[async_trait]
 impl<A: Actor + ?Sized> Actor for Box<A> {
     type Msg = A::Msg;
 
@@ -78,8 +84,8 @@ impl<A: Actor + ?Sized> Actor for Box<A> {
         (**self).supervisor_strategy()
     }
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Option<BasicActorRef>) {
-        (**self).recv(ctx, msg, sender)
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Option<BasicActorRef>) {
+        (**self).recv(ctx, msg, sender).await
     }
 }
 
@@ -93,6 +99,8 @@ impl<A: Actor + ?Sized> Actor for Box<A> {
 /// ```
 /// # use riker::actors::*;
 ///
+/// use async_trait::async_trait;
+///
 /// #[derive(Clone, Debug)]
 /// pub struct Foo;
 /// #[derive(Clone, Debug)]
@@ -101,10 +109,11 @@ impl<A: Actor + ?Sized> Actor for Box<A> {
 /// #[derive(Default)]
 /// struct MyActor;
 ///
+/// #[async_trait]
 /// impl Actor for MyActor {
 ///     type Msg = MyActorMsg; // <-- MyActorMsg is provided for us
 ///
-///     fn recv(&mut self,
+///     async fn recv(&mut self,
 ///                 ctx: &Context<Self::Msg>,
 ///                 msg: Self::Msg,
 ///                 sender: Sender) {

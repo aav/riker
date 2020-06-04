@@ -1,6 +1,8 @@
 use futures::executor::block_on;
 use riker::actors::*;
 
+use async_trait::async_trait;
+
 #[test]
 fn system_create() {
     assert!(ActorSystem::new().is_ok());
@@ -24,6 +26,7 @@ impl ActorFactoryArgs<u32> for ShutdownTest {
     }
 }
 
+#[async_trait]
 impl Actor for ShutdownTest {
     type Msg = ();
 
@@ -37,7 +40,7 @@ impl Actor for ShutdownTest {
         }
     }
 
-    fn recv(&mut self, _: &Context<Self::Msg>, _: Self::Msg, _: Sender) {}
+    async fn recv(&mut self, _: &Context<Self::Msg>, _: Self::Msg, _: Sender) {}
 }
 
 #[test]

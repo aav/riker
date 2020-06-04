@@ -8,6 +8,8 @@ use slog::{info, o, Drain, Level, Logger, Never, OwnedKVList, Record};
 use std::str::FromStr;
 use std::sync::Arc;
 
+use async_trait::async_trait;
+
 pub(crate) type GlobalLoggerGuard = Arc<slog_scope::GlobalLoggerGuard>;
 
 #[derive(Clone)]
@@ -102,6 +104,7 @@ impl ActorFactoryArgs<(ActorRef<ChannelMsg<DeadLetter>>, LoggingSystem)> for Dea
     }
 }
 
+#[async_trait]
 impl Actor for DeadLetterLogger {
     type Msg = DeadLetter;
 
@@ -116,7 +119,7 @@ impl Actor for DeadLetterLogger {
         );
     }
 
-    fn recv(&mut self, _: &Context<Self::Msg>, msg: Self::Msg, _: Option<BasicActorRef>) {
+    async fn recv(&mut self, _: &Context<Self::Msg>, msg: Self::Msg, _: Option<BasicActorRef>) {
         info!(
             self.logger,
             "DeadLetter: {:?} => {:?} ({:?})", msg.sender, msg.recipient, msg.msg

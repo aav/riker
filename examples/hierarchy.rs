@@ -3,13 +3,16 @@ use riker::actors::*;
 
 use std::time::Duration;
 
+use async_trait::async_trait;
+
 #[derive(Default)]
 struct Child;
 
+#[async_trait]
 impl Actor for Child {
     type Msg = String;
 
-    fn recv(&mut self, _ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
+    async fn recv(&mut self, _ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
         println!("child got a message {}", msg);
     }
 }
@@ -20,6 +23,7 @@ struct MyActor {
 }
 
 // implement the Actor trait
+#[async_trait]
 impl Actor for MyActor {
     type Msg = String;
 
@@ -27,7 +31,7 @@ impl Actor for MyActor {
         self.child = Some(ctx.actor_of::<Child>("my-child").unwrap());
     }
 
-    fn recv(&mut self, _ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, _ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         println!("parent got a message {}", msg);
         self.child.as_ref().unwrap().tell(msg, sender);
     }

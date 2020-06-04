@@ -29,6 +29,8 @@ use crate::{
 };
 use slog::{debug, Logger};
 
+use async_trait::async_trait;
+
 // 0. error results on any
 // 1. visibility
 
@@ -780,6 +782,7 @@ impl ShutdownActor {
     }
 }
 
+#[async_trait]
 impl Actor for ShutdownActor {
     type Msg = SystemEvent;
 
@@ -814,7 +817,7 @@ impl Actor for ShutdownActor {
         }
     }
 
-    fn recv(&mut self, _: &Context<Self::Msg>, _: Self::Msg, _: Option<BasicActorRef>) {}
+    async fn recv(&mut self, _: &Context<Self::Msg>, _: Self::Msg, _: Option<BasicActorRef>) {}
 }
 
 impl Receive<ActorTerminated> for ShutdownActor {

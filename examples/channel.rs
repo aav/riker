@@ -4,6 +4,8 @@ use riker::actors::*;
 use riker::system::ActorSystem;
 use std::time::Duration;
 
+use async_trait::async_trait;
+
 #[derive(Clone, Debug)]
 pub struct PowerStatus;
 
@@ -18,6 +20,7 @@ impl ActorFactoryArgs<ChannelRef<PowerStatus>> for GpsActor {
     }
 }
 
+#[async_trait]
 impl Actor for GpsActor {
     type Msg = GpsActorMsg;
 
@@ -35,7 +38,7 @@ impl Actor for GpsActor {
         );
     }
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender);
     }
 }
@@ -59,6 +62,7 @@ impl ActorFactoryArgs<ChannelRef<PowerStatus>> for NavigationActor {
     }
 }
 
+#[async_trait]
 impl Actor for NavigationActor {
     type Msg = NavigationActorMsg;
 
@@ -76,7 +80,7 @@ impl Actor for NavigationActor {
         );
     }
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender);
     }
 }

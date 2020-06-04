@@ -6,6 +6,8 @@ use riker::actors::*;
 use riker_testkit::probe::channel::{probe, ChannelProbe};
 use riker_testkit::probe::{Probe, ProbeReceive};
 
+use async_trait::async_trait;
+
 #[derive(Clone, Debug)]
 pub struct TestProbe(ChannelProbe<(), ()>);
 
@@ -30,6 +32,7 @@ impl ActorFactoryArgs<(ChannelRef<SomeMessage>, Topic)> for Subscriber {
     }
 }
 
+#[async_trait]
 impl Actor for Subscriber {
     type Msg = SubscriberMsg;
 
@@ -44,7 +47,7 @@ impl Actor for Subscriber {
         );
     }
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender);
     }
 }
@@ -158,10 +161,11 @@ pub struct Panic;
 #[derive(Default)]
 struct DumbActor;
 
+#[async_trait]
 impl Actor for DumbActor {
     type Msg = DumbActorMsg;
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender);
     }
 }
@@ -195,6 +199,7 @@ struct EventSubscriber {
     probe: Option<TestProbe>,
 }
 
+#[async_trait]
 impl Actor for EventSubscriber {
     type Msg = EventSubscriberMsg;
 
@@ -210,7 +215,7 @@ impl Actor for EventSubscriber {
         );
     }
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender);
     }
 
@@ -290,6 +295,7 @@ struct DeadLetterSub {
     probe: Option<TestProbe>,
 }
 
+#[async_trait]
 impl Actor for DeadLetterSub {
     type Msg = DeadLetterSubMsg;
 
@@ -305,7 +311,7 @@ impl Actor for DeadLetterSub {
         );
     }
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender)
     }
 }

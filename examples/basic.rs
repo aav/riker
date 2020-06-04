@@ -2,14 +2,17 @@ extern crate riker;
 use riker::actors::*;
 use std::time::Duration;
 
+use async_trait::async_trait;
+
 #[derive(Default)]
 struct MyActor;
 
 // implement the Actor trait
+#[async_trait]
 impl Actor for MyActor {
     type Msg = String;
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
         println!("{} received: {}", ctx.myself.name(), msg);
     }
 }

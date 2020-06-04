@@ -4,15 +4,18 @@ use riker::system::ActorSystem;
 
 use std::time::Duration;
 
+use async_trait::async_trait;
+
 // a simple minimal actor for use in tests
 // #[actor(TestProbe)]
 #[derive(Default, Debug)]
 struct Child;
 
+#[async_trait]
 impl Actor for Child {
     type Msg = String;
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
         println!("{}: {:?} -> got msg: {}", ctx.myself.name(), self, msg);
     }
 }
@@ -20,6 +23,7 @@ impl Actor for Child {
 #[derive(Clone, Default, Debug)]
 struct SelectTest;
 
+#[async_trait]
 impl Actor for SelectTest {
     type Msg = String;
 
@@ -31,7 +35,7 @@ impl Actor for SelectTest {
         let _ = ctx.actor_of::<Child>("child_b").unwrap();
     }
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
         println!("{}: {:?} -> got msg: {}", ctx.myself.name(), self, msg);
         // up and down: ../select-actor/child_a
         let path = "../select-actor/child_a";

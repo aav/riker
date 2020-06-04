@@ -182,7 +182,7 @@ where
     (sender, sys_sender, mailbox)
 }
 
-pub fn run_mailbox<A>(mbox: Mailbox<A::Msg>, ctx: Context<A::Msg>, mut dock: Dock<A>)
+pub async fn run_mailbox<A>(mbox: Mailbox<A::Msg>, ctx: Context<A::Msg>, mut dock: Dock<A>)
 where
     A: Actor,
 {
@@ -198,7 +198,7 @@ where
     process_sys_msgs(&mbox, &ctx, cell, &mut actor);
 
     if actor.is_some() && !mbox.is_suspended() {
-        process_msgs(&mbox, &ctx, cell, &mut actor);
+        process_msgs(&mbox, &ctx, cell, &mut actor).await;
     }
 
     process_sys_msgs(&mbox, &ctx, cell, &mut actor);
@@ -216,7 +216,7 @@ where
     }
 }
 
-fn process_msgs<A>(
+async fn process_msgs<A>(
     mbox: &Mailbox<A::Msg>,
     ctx: &Context<A::Msg>,
     cell: &ExtendedCell<A::Msg>,
@@ -231,7 +231,7 @@ fn process_msgs<A>(
             match mbox.try_dequeue() {
                 Ok(msg) => {
                     let (msg, sender) = (msg.msg, msg.sender);
-                    actor.as_mut().unwrap().recv(ctx, msg, sender);
+                    actor.as_mut().unwrap().recv(ctx, msg, sender).await;
                     process_sys_msgs(&mbox, &ctx, cell, actor);
 
                     count += 1;

@@ -3,6 +3,8 @@ use riker::actors::*;
 
 use std::time::Duration;
 
+use async_trait::async_trait;
+
 #[derive(Clone, Debug)]
 pub struct SomeMessage;
 
@@ -10,10 +12,11 @@ pub struct SomeMessage;
 #[derive(Default)]
 struct DumbActor;
 
+#[async_trait]
 impl Actor for DumbActor {
     type Msg = DumbActorMsg;
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender);
     }
 }
@@ -31,6 +34,7 @@ impl Receive<SomeMessage> for DumbActor {
 #[derive(Default)]
 struct DeadLetterActor;
 
+#[async_trait]
 impl Actor for DeadLetterActor {
     type Msg = DeadLetterActorMsg;
 
@@ -49,7 +53,7 @@ impl Actor for DeadLetterActor {
             .tell(Subscribe { actor: sub, topic }, None);
     }
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender);
     }
 }

@@ -10,6 +10,8 @@ use chrono::{Duration as CDuration, Utc};
 use std::time::Duration;
 use uuid::Uuid;
 
+use async_trait::async_trait;
+
 #[derive(Clone, Debug)]
 pub struct TestProbe(ChannelProbe<(), ()>);
 
@@ -22,10 +24,11 @@ struct ScheduleOnce {
     probe: Option<TestProbe>,
 }
 
+#[async_trait]
 impl Actor for ScheduleOnce {
     type Msg = ScheduleOnceMsg;
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender);
     }
 }
@@ -84,10 +87,11 @@ struct ScheduleRepeat {
     schedule_id: Option<Uuid>,
 }
 
+#[async_trait]
 impl Actor for ScheduleRepeat {
     type Msg = ScheduleRepeatMsg;
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender);
     }
 }

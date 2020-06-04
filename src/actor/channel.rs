@@ -11,6 +11,8 @@ use crate::{
     Message,
 };
 
+use async_trait::async_trait;
+
 type Subs<Msg> = HashMap<Topic, Vec<BoxedTell<Msg>>>;
 
 /// A specialized actor for providing Publish/Subscribe capabilities to users.
@@ -33,6 +35,7 @@ impl<Msg: Message> Default for Channel<Msg> {
     }
 }
 
+#[async_trait]
 impl<Msg> Actor for Channel<Msg>
 where
     Msg: Message,
@@ -50,7 +53,7 @@ where
         // ctx.myself.tell(msg, None);
     }
 
-    fn recv(&mut self, ctx: &ChannelCtx<Msg>, msg: ChannelMsg<Msg>, sender: Sender) {
+    async fn recv(&mut self, ctx: &ChannelCtx<Msg>, msg: ChannelMsg<Msg>, sender: Sender) {
         self.receive(ctx, msg, sender);
     }
 
@@ -165,14 +168,15 @@ fn unsubscribe<Msg>(subs: &mut Subs<Msg>, topic: &Topic, actor: &dyn ActorRefere
 #[derive(Default)]
 pub struct EventsChannel(Channel<SystemEvent>);
 
+#[async_trait]
 impl Actor for EventsChannel {
     type Msg = ChannelMsg<SystemEvent>;
 
     fn pre_start(&mut self, ctx: &ChannelCtx<SystemEvent>) {
         self.0.pre_start(ctx);
     }
-
-    fn recv(
+    
+    async fn recv(
         &mut self,
         ctx: &ChannelCtx<SystemEvent>,
         msg: ChannelMsg<SystemEvent>,

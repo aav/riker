@@ -13,6 +13,8 @@ use crate::{
     validate::validate_name,
 };
 
+use async_trait::async_trait;
+
 #[derive(Clone)]
 pub struct Provider {
     inner: Arc<Mutex<ProviderInner>>,
@@ -222,10 +224,11 @@ impl ActorFactoryArgs<(String, LoggingSystem)> for Guardian {
     }
 }
 
+#[async_trait]
 impl Actor for Guardian {
     type Msg = SystemMsg;
 
-    fn recv(&mut self, _: &Context<Self::Msg>, _: Self::Msg, _: Option<BasicActorRef>) {}
+    async fn recv(&mut self, _: &Context<Self::Msg>, _: Self::Msg, _: Option<BasicActorRef>) {}
 
     fn post_stop(&mut self) {
         trace!(self.log, "{} guardian stopped", self.name);

@@ -3,7 +3,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use futures::{channel::mpsc::channel, task::SpawnExt, StreamExt};
+use futures::{channel::mpsc::channel, task::SpawnExt, StreamExt, FutureExt};
 use slog::warn;
 
 use crate::{
@@ -69,9 +69,8 @@ where
 
                     let mb = mailbox.clone();
                     let d = dock.clone();
-
-                    let _ = std::panic::catch_unwind(AssertUnwindSafe(|| run_mailbox(mb, ctx, d)));
-                    //.unwrap();
+                    
+                    let _ = AssertUnwindSafe(run_mailbox(mb, ctx, d)).catch_unwind().await;
                 }
                 KernelMsg::RestartActor => {
                     restart_actor(&dock, actor_ref.clone().into(), &props, &asys);

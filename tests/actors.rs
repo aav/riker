@@ -6,6 +6,8 @@ use riker::actors::*;
 use riker_testkit::probe::channel::{probe, ChannelProbe};
 use riker_testkit::probe::{Probe, ProbeReceive};
 
+use async_trait::async_trait;
+
 #[derive(Clone, Debug)]
 pub struct Add;
 
@@ -19,11 +21,12 @@ struct Counter {
     count: u32,
 }
 
+#[async_trait]
 impl Actor for Counter {
     // we used the #[actor] attribute so CounterMsg is the Msg type
     type Msg = CounterMsg;
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, sender: Sender) {
         self.receive(ctx, msg, sender);
     }
 }
@@ -105,6 +108,7 @@ struct Parent {
     probe: Option<TestProbe>,
 }
 
+#[async_trait]
 impl Actor for Parent {
     type Msg = TestProbe;
 
@@ -124,7 +128,7 @@ impl Actor for Parent {
         self.probe.as_ref().unwrap().0.event(());
     }
 
-    fn recv(&mut self, _ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
+    async fn recv(&mut self, _ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
         self.probe = Some(msg);
         self.probe.as_ref().unwrap().0.event(());
     }
@@ -133,10 +137,11 @@ impl Actor for Parent {
 #[derive(Default)]
 struct Child;
 
+#[async_trait]
 impl Actor for Child {
     type Msg = ();
 
-    fn recv(&mut self, _: &Context<Self::Msg>, _: Self::Msg, _: Sender) {}
+    async fn recv(&mut self, _: &Context<Self::Msg>, _: Self::Msg, _: Sender) {}
 }
 
 #[test]

@@ -23,6 +23,7 @@ impl Props {
     ///
     /// ```
     /// # use riker::actors::*;
+    /// # use async_trait::async_trait;
     ///
     /// struct User;
     ///
@@ -32,9 +33,10 @@ impl Props {
     ///     }
     /// }
     ///
+    /// # #[async_trait]
     /// # impl Actor for User {
     /// #    type Msg = String;
-    /// #    fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
+    /// #    async fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
     /// # }
     /// // main
     /// let sys = ActorSystem::new().unwrap();
@@ -60,6 +62,8 @@ impl Props {
     /// ```
     /// # use riker::actors::*;
     ///
+    /// # use async_trait::async_trait;
+    ///
     /// struct User {
     ///     name: String,
     /// }
@@ -72,9 +76,10 @@ impl Props {
     ///     }
     /// }
     ///
+    /// # #[async_trait]
     /// # impl Actor for User {
     /// #    type Msg = String;
-    /// #    fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
+    /// #    async fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
     /// # }
     /// // main
     /// let sys = ActorSystem::new().unwrap();
@@ -86,7 +91,8 @@ impl Props {
     /// An actor requiring multiple parameters.
     /// ```
     /// # use riker::actors::*;
-    ///
+    /// # use async_trait::async_trait;
+    /// 
     /// struct BankAccount {
     ///     name: String,
     ///     number: String,
@@ -101,9 +107,10 @@ impl Props {
     ///     }
     /// }
     ///
+    /// # #[async_trait]
     /// # impl Actor for BankAccount {
     /// #    type Msg = String;
-    /// #    fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
+    /// #    async fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
     /// # }
     /// // main
     /// let sys = ActorSystem::new().unwrap();
@@ -133,13 +140,15 @@ impl Props {
     ///
     /// ```
     /// # use riker::actors::*;
+    /// use async_trait::async_trait;
     ///
     /// #[derive(Default)]
     /// struct User;
     ///
+    /// #[async_trait]
     /// # impl Actor for User {
     /// #    type Msg = String;
-    /// #    fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
+    /// #    async fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
     /// # }
     /// // main
     /// let sys = ActorSystem::new().unwrap();
@@ -156,6 +165,8 @@ impl Props {
     /// ```
     /// # use riker::actors::*;
     ///
+    /// use async_trait::async_trait;
+    ///
     /// struct User;
     ///
     /// impl ActorFactory for User {
@@ -164,9 +175,10 @@ impl Props {
     ///     }
     /// }
     ///
+    /// # #[async_trait]
     /// # impl Actor for User {
     /// #    type Msg = String;
-    /// #    fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
+    /// #    async fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
     /// # }
     /// // main
     /// let sys = ActorSystem::new().unwrap();
@@ -190,7 +202,8 @@ impl Props {
     /// An actor requiring a single parameter.
     /// ```
     /// # use riker::actors::*;
-    ///
+    /// use async_trait::async_trait;
+    /// 
     /// struct User {
     ///     name: String,
     /// }
@@ -202,10 +215,10 @@ impl Props {
     ///         }
     ///     }
     /// }
-    ///
+    /// # #[async_trait]
     /// # impl Actor for User {
     /// #    type Msg = String;
-    /// #    fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
+    /// #    async fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
     /// # }
     /// // main
     /// let sys = ActorSystem::new().unwrap();
@@ -218,6 +231,7 @@ impl Props {
     /// ```
     /// # use riker::actors::*;
     ///
+    /// # use async_trait::async_trait;
     /// struct BankAccount {
     ///     name: String,
     ///     number: String,
@@ -232,9 +246,10 @@ impl Props {
     ///     }
     /// }
     ///
+    /// # #[async_trait]
     /// # impl Actor for BankAccount {
     /// #    type Msg = String;
-    /// #    fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
+    /// #    async fn recv(&mut self, _ctx: &Context<String>, _msg: String, _sender: Sender) {}
     /// # }
     /// // main
     /// let sys = ActorSystem::new().unwrap();

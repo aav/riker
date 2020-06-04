@@ -6,6 +6,8 @@ use riker::actors::*;
 use riker_testkit::probe::channel::{probe, ChannelProbe};
 use riker_testkit::probe::{Probe, ProbeReceive};
 
+use async_trait::async_trait;
+
 #[derive(Clone, Debug)]
 pub struct TestProbe(ChannelProbe<(), ()>);
 
@@ -14,10 +16,11 @@ pub struct TestProbe(ChannelProbe<(), ()>);
 #[derive(Default)]
 struct Child;
 
+#[async_trait]
 impl Actor for Child {
     type Msg = TestProbe;
 
-    fn recv(&mut self, _ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
+    async fn recv(&mut self, _ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
         msg.0.event(());
     }
 }
@@ -25,6 +28,7 @@ impl Actor for Child {
 #[derive(Default)]
 struct SelectTest;
 
+#[async_trait]
 impl Actor for SelectTest {
     type Msg = TestProbe;
 
@@ -36,7 +40,7 @@ impl Actor for SelectTest {
         let _ = ctx.actor_of::<Child>("child_b").unwrap();
     }
 
-    fn recv(&mut self, _ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
+    async fn recv(&mut self, _ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
         msg.0.event(());
     }
 }
@@ -109,6 +113,7 @@ fn select_all_children_of_child() {
 #[derive(Clone, Default)]
 struct SelectTest2;
 
+#[async_trait]
 impl Actor for SelectTest2 {
     type Msg = TestProbe;
 
@@ -120,7 +125,7 @@ impl Actor for SelectTest2 {
         let _ = ctx.actor_of::<Child>("child_b").unwrap();
     }
 
-    fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
+    async fn recv(&mut self, ctx: &Context<Self::Msg>, msg: Self::Msg, _sender: Sender) {
         // up and down: ../select-actor/child_a
         let sel = ctx.select("../select-actor/child_a").unwrap();
         sel.try_tell(msg.clone(), None);
